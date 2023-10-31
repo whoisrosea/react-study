@@ -1,0 +1,10 @@
+.myBttn {
+  padding: 10px;
+  color: rgb(255, 255, 255);
+  font-size: 14px;
+  background: transparent;
+  border: 2px solid #6948d746;
+  cursor: pointer;
+  background-color: #876ED7;
+  border-radius: 6px;
+}

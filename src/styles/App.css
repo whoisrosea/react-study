@@ -1,0 +1,8 @@
+.pageButton{
+  padding: 8px;
+}
+
+.pageButtonCurrent{
+  padding:8px;
+  border: 2px solid rgb(106, 72, 215);
+}
