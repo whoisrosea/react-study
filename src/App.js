@@ -1,82 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { usePosts } from "./hooks/usePosts";
-import PostList from "./components/PostList";
-import PostForm from "./components/PostForm";
-import PostFliter from "./components/PostFilter";
-import MyModal from "./components/UI/MyModal/MyModal";
-import MyButton from "./components/UI/button/MyButton";
-import { useFetching } from "./hooks/useFetching";
-import postService from "./API/PostService";
-import { getPageArray, getPageCount } from "./utils/pages";
 import "./styles/App.css";
+import { BrowserRouter } from "react-router-dom";
+import AppRouter from "./components/AppRouter";
+import NavBar from "./components/NavBar";
+import { AuthContext } from "./context";
 
 function App() {
-  const [posts, setPosts] = useState([]);
-
-  const [visibility, setVisibility] = useState(false);
-
-  const [filter, setFilter] = useState({ query: "", sort: "" });
-
-  const searchedAndSortedPosts = usePosts(posts, filter.sort, filter.query);
-
-  const [totalPages, setTotalPages] = useState(0);
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(1);
-
-  const [fetching, isLoading] = useFetching(async () => {
-    const response = await postService.getAll(limit, page);
-    console.log(response.headers["x-total-count"]);
-    setPosts(response.data);
-    setTotalPages(getPageCount(response.headers["x-total-count"], limit));
-  });
-
-  let pagesArray = getPageArray(totalPages);
-
-  const createPost = (newPost) => {
-    setPosts([...posts, newPost]);
-  };
-
-  const removePost = (post) => {
-    setPosts(posts.filter((p) => p.id !== post.id));
-  };
-
-  const changePage = ( page ) => {
-    setPage(page)
-    fetching()
-
-  }
+  const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
-    fetching();
-  }, [page]);
+    if(localStorage.getItem('auth')){
+      setIsAuth(true)
+    }
+  }, [])
 
   return (
-    <div style={{ padding: "0px 300px", textAlign: "center" }}>
-      <MyButton onClick={() => setVisibility(true)}>создать пост!</MyButton>
-
-      <MyModal visible={visibility} setVisible={setVisibility}>
-        <PostForm create={createPost} setVisible={setVisibility} />
-      </MyModal>
-
-      <hr style={{ margin: "10px 0px" }} />
-
-      <PostFliter filter={filter} setFilter={setFilter} />
-
-      {isLoading ? (
-        <h1>loading.//</h1>
-      ) : (
-        <PostList
-          remove={removePost}
-          posts={searchedAndSortedPosts}
-          title={"список постов"}
-        />
-      )}
-      {pagesArray.map((p) => (
-        <button onClick={() => changePage(p)} key={p} className={page === p ? "pageButtonCurrent" : "pageButton"}>
-          {p}
-        </button>
-      ))}
-    </div>
+    <AuthContext.Provider
+      value={{
+        isAuth,
+        setIsAuth,
+      }}
+    >
+      <BrowserRouter>
+        <NavBar />
+        <AppRouter />
+      </BrowserRouter>
+    </AuthContext.Provider>
   );
 }
 
